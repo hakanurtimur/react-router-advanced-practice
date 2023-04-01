@@ -1,11 +1,61 @@
-// Challenge / Exercise
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import EditEventPage, {action as deleteEventAction} from "./pages/EditEventPage";
+import ErrorPage from "./pages/ErrorPage";
+import EventDetailPage, { loader as loadEventDetails } from "./pages/EventDetailPage";
+import EventsPage, { loader as eventLoader } from "./pages/EventsPage";
+import HomePage from "./pages/HomePage";
+import Layout from "./pages/Layout";
+import NewEventPage from "./pages/NewEventPage";
+import RoutPage from "./pages/RoutPage";
+import { action as manipulateEventAction } from "./components/EventForm"
 
+import NewsletterPage, { action as newsletterAction } from './pages/NewsletterPage';
+
+// Challenge / Exercise
+const router = createBrowserRouter([
+  {
+    path: "",
+    element: <RoutPage />,
+    errorElement: <ErrorPage></ErrorPage>,
+    children: [
+      { index: true, element: <HomePage /> },
+      {
+        path: "events",
+        element: <Layout />,
+        children: [
+          {
+            index: true,
+            element: <EventsPage />,
+            //burada loader sayesinde fetch ediyoruz  standart fetch kodunu yazıyoruz
+            loader: eventLoader,
+          },
+          {
+            path: ":eventId",
+            loader: loadEventDetails,
+            id: 'event-detail',
+            children: [
+              { index: true, element: <EventDetailPage />, action: deleteEventAction },
+              { path: "edit", element: <EditEventPage />, action: manipulateEventAction },
+            ],
+          },
+          { path: "new", element: <NewEventPage />, action: manipulateEventAction },
+        ],
+      },
+      {
+        path: 'newsletter',
+        element: <NewsletterPage />,
+        action: newsletterAction,
+      },
+    ],
+  },
+]);
 // 1. Add five new (dummy) page components (content can be simple <h1> elements)
 //    - HomePage
 //    - EventsPage
 //    - EventDetailPage
 //    - NewEventPage
 //    - EditEventPage
+
 // 2. Add routing & route definitions for these five pages
 //    - / => HomePage
 //    - /events => EventsPage
@@ -21,7 +71,7 @@
 // BONUS: Add another (nested) layout route that adds the <EventNavigation> component above all /events... page components
 
 function App() {
-  return <div></div>;
+  return <RouterProvider router={router}></RouterProvider>;
 }
 
 export default App;
